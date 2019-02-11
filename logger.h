@@ -9,6 +9,13 @@
 #include <chrono>
 #include <thread>
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+#include <fcntl.h>
+#include <io.h>
+
 #define INFO 1
 #define ERROR 2
 #define REQUEST 3
@@ -19,15 +26,27 @@
 #define IN_REQ_ERROR 8
 #define DEBUG 9
 
+#define __FILENAME__    strrchr(__FILE__, '\\') +1
+
+#define WHERE() awhere(__FILENAME__, __FUNCTION__, __LINE__)
+
+std::string awhere(const char* file, char* func, int line);
+
 class AhatLogItem
 {
-private:
-	std::string thread_name;
-	std::string log_time;
+public:
+	std::thread::id thread_id;
+	char* log_time;
 	std::string src_name;
-	std::string src_line;
+	int src_line;
 	std::string src_func;
 	std::string log_type;
+
+	
+void getCurTime();
+
+	AhatLogItem();
+	~AhatLogItem();
 	/*
 	AhatLogItem() {};
 
@@ -53,6 +72,7 @@ private:
 
 class AhatLogItemInfo : public AhatLogItem
 {
+public:
 	std::string body;
 
 //	AhatLogItemInfo() { AhatLogItem(); };
@@ -131,19 +151,26 @@ class AhatLogItemDebug : public AhatLogItem
 class AhatLogger
 {
 private:
+	static std::string path;
+
 	static std::string name;
 	static std::string version;
 	static std::string host;
 
 	static std::queue< std::shared_ptr<AhatLogItem> > *q;
 
+	static bool isStarted;
+
+	void infoWrite(std::shared_ptr<AhatLogItemInfo> item, std::ofstream f);
+
 public:
 	
+	static void setting(std::string _path);
 	static void run();
-	static void info();
+	static void info(std::string src_file, std::string body);
 	static void start();
+
 };
 
-std::string getCurTime();
 
 #endif
