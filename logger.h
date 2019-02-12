@@ -8,6 +8,7 @@
 #include <memory>
 #include <chrono>
 #include <thread>
+#include <mutex>
 
 #include <iostream>
 #include <fstream>
@@ -16,58 +17,61 @@
 #include <fcntl.h>
 #include <io.h>
 
-#define INFO 1
-#define ERROR 2
-#define REQUEST 3
-#define RESPONSE 4
-#define DB 5
-#define DB_ERROR 6
-#define IN_REQ 7
-#define IN_REQ_ERROR 8
-#define DEBUG 9
+#define AHAT_LOG_INFO 1
+#define AHAT_LOG_ERROR 2
+#define AHAT_LOG_REQUEST 3
+#define AHAT_LOG_RESPONSE 4
+#define AHAT_LOG_DB 5
+#define AHAT_LOG_DB_ERROR 6
+#define AHAT_LOG_IN_REQ 7
+#define AHAT_LOG_IN_REQ_ERROR 8
+#define AHAT_LOG_DEBUG 9
 
 #define __FILENAME__    strrchr(__FILE__, '\\') +1
 
-#define WHERE() awhere(__FILENAME__, __FUNCTION__, __LINE__)
+#define WHERE() code(__FILENAME__, __FUNCTION__, __LINE__)
 
-std::string awhere(const char* file, char* func, int line);
+std::string code(const char* file, char* func, int line);
+
+
+class AhatLogger
+{
+private:
+	static std::string path;
+
+	static std::string name;
+	static std::string version;
+	static std::string host;
+	
+	static std::queue< std::string > *q;
+
+	static bool isStarted;
+	
+	static std::string getCurTime();
+
+public:
+	static std::mutex mutex;
+	
+	static void setting(std::string _path);
+	static void run();
+	static void info(std::string src_file, std::string body);
+	static void start();
+
+};
+
+
 
 class AhatLogItem
 {
 public:
-	std::thread::id thread_id;
-	char* log_time;
-	std::string src_name;
-	int src_line;
-	std::string src_func;
-	std::string log_type;
-
-	
-void getCurTime();
+	std::string log_time;
+	std::string src_file;
+	int log_type;
 
 	AhatLogItem();
 	~AhatLogItem();
-	/*
-	AhatLogItem() {};
 
-	AhatLogItem
-	(
-		std::string thread_name,
-		std::string log_time,
-		std::string src_name,
-		std::string src_line,
-		std::string src_func,
-		std::string log_type
-	)
-	{
-		this->thread_name = thread_name;
-		this->log_time = log_time;
-		this->src_name = src_name;
-		this->src_line = src_line;
-		this->src_func = src_func;
-		this->log_type = log_type;
-	}
-	*/
+	std::string message() {};
 };	
 
 class AhatLogItemInfo : public AhatLogItem
@@ -75,9 +79,15 @@ class AhatLogItemInfo : public AhatLogItem
 public:
 	std::string body;
 
-//	AhatLogItemInfo() { AhatLogItem(); };
+	std::string message()
+	{
+		std::stringstream aa;
+		aa << "INFO," << log_time << "," << src_file << "," << std::this_thread::get_id() << "," << body;
+	
+		return aa.str();
+	};
 };
-
+/*
 class AhatLogItemError : public AhatLogItem
 {
 	std::string body;
@@ -146,31 +156,5 @@ class AhatLogItemDebug : public AhatLogItem
 {
 	std::string body;
 };
-
-
-class AhatLogger
-{
-private:
-	static std::string path;
-
-	static std::string name;
-	static std::string version;
-	static std::string host;
-
-	static std::queue< std::shared_ptr<AhatLogItem> > *q;
-
-	static bool isStarted;
-
-	void infoWrite(std::shared_ptr<AhatLogItemInfo> item, std::ofstream f);
-
-public:
-	
-	static void setting(std::string _path);
-	static void run();
-	static void info(std::string src_file, std::string body);
-	static void start();
-
-};
-
-
+*/
 #endif

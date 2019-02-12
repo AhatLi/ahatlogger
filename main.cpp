@@ -12,17 +12,13 @@
  
 int main()
 {
-	std::stringstream aa;
-	aa<<"1111"<<333<<5454<<"3333";
-	aa.str();
+	AhatLogger::setting("C:\\Users\\castis\\Desktop\\share\\ahat.log");
+	AhatLogger::start();
 
-
-	while(1)
+	for(int i = 0; i < 100000; i++)
 	{
-		AhatLogger::setting("C:\\Users\\castis\\Desktop\\share\\ahat.log");
-		AhatLogger::start();
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		AhatLogger::info(WHERE(), "ttt");
+		AhatLogger::info(CODE(), "ttt");
+		AhatLogger::info(CODE(), "로그입니다 로그");
 	}
 	
 	return 0;
