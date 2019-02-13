@@ -6,7 +6,7 @@ std::string		AhatLogger::path;
 std::mutex		AhatLogger::mutex;
 int				AhatLogger::level;
 
-std::string code(const char* file, char* func, int line)
+std::string code(std::string file, std::string func, int line)
 {
 	std::stringstream buf;
 	buf<<file<<","<<func<<":"<<line;
@@ -99,6 +99,9 @@ void AhatLogger::CUSTOM(std::string src_file, std::string custom, std::string bo
 
 void AhatLogger::DEBUG(std::string src_file, std::string body)
 {
+	if(level < 1)
+		return;
+
 	AhatLogItemDebug log(src_file, body);
 	
 	mutex.lock();

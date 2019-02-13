@@ -15,15 +15,19 @@
 #include <sstream>
 
 #include <fcntl.h>
-#include <io.h>
+#include <string.h>
 
 #include "ahatloggeritem.h"
 
+#ifdef __linux__
+#define __FILENAME__    __FILE__
+#else
 #define __FILENAME__    strrchr(__FILE__, '\\') +1
+#endif
 
-#define CODE() code(__FILENAME__, __FUNCTION__, __LINE__)
+#define CODE code(__FILENAME__, __FUNCTION__, __LINE__)
 
-std::string code(const char* file, char* func, int line);
+std::string code(std::string file, std::string func, int line);
 
 class AhatLogger
 {

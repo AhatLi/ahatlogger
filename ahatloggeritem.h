@@ -4,6 +4,12 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <iomanip>
+
+#ifdef __linux__
+#define localtime_s(X, Y) localtime_r(Y, X)
+#else
+#endif
 
 std::string getCurTime();
 

@@ -122,8 +122,13 @@ std::string getCurTime()
 	struct tm tm;
 	localtime_s(&tm, &tt);
  
-	char buf[64];
-	sprintf_s(buf, "%d-%02d-%02d %02d:%02d:%02d.%03d",tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, ms);
+	std::stringstream s;
+	s << tm.tm_year+1900 << "-" << std::setfill('0') << std::setw(2) << tm.tm_mon+1 << "-" << 
+		std::setfill('0') << std::setw(2) << tm.tm_mday << " " << 
+		std::setfill('0') << std::setw(2) << tm.tm_hour << ":" << 
+		std::setfill('0') << std::setw(2) << tm.tm_min << ":" << 
+		std::setfill('0') << std::setw(2) << tm.tm_sec << "." << 
+		std::setfill('0') << std::setw(3) << ms.count();
 
-	return std::string(buf);
+	return s.str();
 }
