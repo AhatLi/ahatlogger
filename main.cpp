@@ -1,4 +1,4 @@
-#include "logger.h"
+#include "ahatlogger.h"
 
 #include <iostream>
 #include <thread>
@@ -15,7 +15,7 @@ int main()
 	AhatLogger::setting("C:\\Users\\castis\\Desktop\\share\\ahat.log", 1);
 	AhatLogger::start();
 
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 1000; i++)
 	{
 		std::stringstream s;
 		s<<"로그입니다 "<<i;
@@ -30,8 +30,8 @@ int main()
 		AhatLogger::IN_REQ_ERR(CODE(),InReqItem("1", "2", "3"), s.str());
 
 		AhatLogger::CUSTOM(CODE(), "AHAT", s.str());
-	AhatLogger::stop();
 	}
-	
+	std::cout<<"끝\n";
+	getchar();
 	return 0;
 }
