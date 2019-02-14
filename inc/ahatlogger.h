@@ -40,9 +40,12 @@ private:
 	
 	static std::queue< std::pair<std::string, std::string> > *q;
 	static bool isStarted;
+	static bool isFinished;
 	static int level;
 
 	static void run();
+	
+	static void logWrite();
 public:
 	static std::mutex mutex;
 	

@@ -16,15 +16,14 @@ int main()
 		AhatLogger::ERROR(CODE, s.str());
 		AhatLogger::DEBUG(CODE, s.str());
 		
-		AhatLogger::DB(CODE,InDBtem("1", "2"), s.str());
-		AhatLogger::DB_ERROR(CODE,InDBtem("1", "2"), s.str());
+		AhatLogger::DB(CODE,InDBtem("db_req_func", "db_req_body"), s.str());
+		AhatLogger::DB_ERROR(CODE,InDBtem("db_req_func", "db_req_body"), s.str());
 
-		AhatLogger::IN_REQ(CODE,InReqItem("1", "2", "3"), s.str());
-		AhatLogger::IN_REQ_ERR(CODE,InReqItem("1", "2", "3"), s.str());
+		AhatLogger::IN_REQ(CODE,InReqItem("in_req_ip", "in_req_port", "in_req_url", "in_req_body"), s.str());
+		AhatLogger::IN_REQ_ERR(CODE,InReqItem("in_req_ip", "in_req_port", "in_req_url", "in_req_body"), s.str());
 
 		AhatLogger::CUSTOM(CODE, "AHAT", s.str());
 	}
 	AhatLogger::stop();
-	getchar();
 	return 0;
 }

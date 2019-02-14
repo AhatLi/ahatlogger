@@ -2,6 +2,7 @@
 
 std::queue< std::pair<std::string, std::string> > *	AhatLogger::q = NULL;
 bool			AhatLogger::isStarted = false;
+bool			AhatLogger::isFinished = false;
 std::string		AhatLogger::path;
 std::mutex		AhatLogger::mutex;
 int				AhatLogger::level;
@@ -27,41 +28,62 @@ void AhatLogger::start()
 void AhatLogger::stop()
 {
 	isStarted = false;
+	
+	while(1)
+	{
+		if(isFinished)
+			break;
+		else
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+	
+	isFinished = false;
 }
 
 void AhatLogger::run()
 {
 	while(isStarted)
 	{
-		if(q->size() <= 0)
+		if(!q->size())
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			continue;
 		}
 		
-		std::ofstream f;
-		f.open(path, std::ios::out | std::ios::app);
-		
-		mutex.lock();
-
-		std::queue< std::pair<std::string, std::string> > *qq = q;
-		q = new std::queue< std::pair<std::string, std::string> >();
-
-		mutex.unlock();
-
-		int size = qq->size();
-		for(int i = 0; i < size; i++)
-		{
-			std::pair<std::string, std::string>  item = qq->front();
-			qq->pop();
-
-			f << item.first<< "," << getCurTime() << item.second << "\n";
-		}
-		
-		delete qq;
-			
-		f.close();
+		logWrite();
 	}
+	if(q->size())
+	{
+		logWrite();
+	}
+	
+	isFinished = true;
+}
+
+void AhatLogger::logWrite()
+{
+	std::ofstream f;
+	f.open(path, std::ios::out | std::ios::app);
+	
+	mutex.lock();
+
+	std::queue< std::pair<std::string, std::string> > *qq = q;
+	q = new std::queue< std::pair<std::string, std::string> >();
+
+	mutex.unlock();
+
+	int size = qq->size();
+	for(int i = 0; i < size; i++)
+	{
+		std::pair<std::string, std::string>  item = qq->front();
+		qq->pop();
+
+		f << item.first<< "," << getCurTime() << item.second << "\n";
+	}
+	
+	delete qq;
+		
+	f.close();
 }
 
 void AhatLogger::setting(std::string path, int level)
@@ -143,9 +165,9 @@ void AhatLogger::DB_ERROR(std::string src_file, InDBtem db_req_item, std::string
 	mutex.unlock();
 }
 
-void AhatLogger::IN_REQ(std::string src_file, InReqItem in_req_item, std::string in_res_body)
+void AhatLogger::IN_REQ(std::string src_file, InReqItem in_req_item, std::string in_req_body)
 {
-	AhatLogItemInReq log(src_file, in_req_item, in_res_body);
+	AhatLogItemInReq log(src_file, in_req_item, in_req_body);
 	
 	mutex.lock();
 	AhatLogger::q->push( std::pair<std::string, std::string>("IN_REQ", log.message()));
