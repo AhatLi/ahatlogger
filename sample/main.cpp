@@ -1,13 +1,6 @@
-#include "ahatlogger.h"
+#include <ahatlogger.h>
 
 #include <iostream>
-#include <thread>
-#include <iostream>
-#include <iomanip>
-#include <ctime>
-#include <chrono>
-#include <time.h>
-
 #include <sstream>
  
 int main()
@@ -15,10 +8,10 @@ int main()
 	AhatLogger::setting("ahat.log", 1);
 	AhatLogger::start();
 
-	for(int i = 0; i < 1; i++)
+	for(int i = 0; i < 100; i++)
 	{
 		std::stringstream s;
-		s<<"wwwww"<<i;
+		s<<"sample  "<<i;
 		AhatLogger::INFO(CODE, s.str());
 		AhatLogger::ERROR(CODE, s.str());
 		AhatLogger::DEBUG(CODE, s.str());
@@ -31,7 +24,7 @@ int main()
 
 		AhatLogger::CUSTOM(CODE, "AHAT", s.str());
 	}
-	std::cout<<"³¡\n";
+	AhatLogger::stop();
 	getchar();
 	return 0;
 }
