@@ -1,28 +1,30 @@
 #include <ahatlogger.h>
 
 #include <iostream>
-#include <sstream>
  
 int main()
 {
-	AhatLogger::setting("ahat.log", 1);
+	//setting( logfile path, loglevel )   loglevel 0 print debug log
+	AhatLogger::setting("ahat.log", 1); 
 	AhatLogger::start();
 
-	for(int i = 0; i < 100; i++)
+	for(int i = 0; i < 10; i++)
 	{
-		std::stringstream s;
-		s<<"sample  "<<i;
-		AhatLogger::INFO(CODE, s.str());
-		AhatLogger::ERROR(CODE, s.str());
-		AhatLogger::DEBUG(CODE, s.str());
+		AhatLogger::INFO(CODE, "infolog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
+		AhatLogger::ERROR(CODE, "errorlog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
+		AhatLogger::DEBUG(CODE, "debuglog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
+
+		AhatLogger::CUSTOM(CODE, "AHAT", "debuglog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
 		
-		AhatLogger::DB(CODE,InDBtem("db_req_func", "db_req_body"), s.str());
-		AhatLogger::DB_ERROR(CODE,InDBtem("db_req_func", "db_req_body"), s.str());
+		InDBtem dbitem("db_req_func", "db_req_body");
+		//DB Request process
+		AhatLogger::DB(CODE, dbitem, "db_res_body");
+		AhatLogger::DB_ERROR(CODE, dbitem, "db_res_body");
 
-		AhatLogger::IN_REQ(CODE,InReqItem("in_req_ip", "in_req_port", "in_req_url", "in_req_body"), s.str());
-		AhatLogger::IN_REQ_ERR(CODE,InReqItem("in_req_ip", "in_req_port", "in_req_url", "in_req_body"), s.str());
-
-		AhatLogger::CUSTOM(CODE, "AHAT", s.str());
+		InReqItem reqitem("in_req_ip", "in_req_port", "in_req_url", "in_req_body");
+		//Network Request process
+		AhatLogger::IN_REQ(CODE, reqitem, "in_res_body");
+		AhatLogger::IN_REQ_ERR(CODE, reqitem, "in_res_body");
 	}
 	AhatLogger::stop();
 	return 0;

@@ -13,6 +13,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdarg>
+#include <stdarg.h>
 
 #include <fcntl.h>
 #include <string.h>
@@ -21,6 +23,8 @@
 
 #ifdef __linux__
 #define __FILENAME__    __FILE__
+#define vsprintf_s(W, X, Y, Z) vsprintf(W, Y, Z)
+int _vscprintf (const char * format, va_list pargs);
 #else
 #define __FILENAME__    strrchr(__FILE__, '\\') +1
 #endif
@@ -53,11 +57,11 @@ public:
 	static void start();
 	static void stop();
 	
-	static void INFO(std::string src_file, std::string body);
-	static void ERROR(std::string src_file, std::string body);
-	static void DEBUG(std::string src_file, std::string body);
+	static void INFO(std::string src_file, char* body, ...);
+	static void ERROR(std::string src_file, char* body, ...);
+	static void DEBUG(std::string src_file, char* body, ...);
 
-	static void CUSTOM(std::string src_file, std::string custom, std::string body);
+	static void CUSTOM(std::string src_file, std::string custom, char*, ...);
 
 	static void REQUEST(std::string src_file, std::string req_ip, std::string req_uri);
 	static void RESPONSE(std::string src_file, std::string res_body, std::string res_code);

@@ -92,39 +92,92 @@ void AhatLogger::setting(std::string path, int level)
 	AhatLogger::level = level;
 }
 
-void AhatLogger::INFO(std::string src_file, std::string body)
+void AhatLogger::INFO(std::string src_file, char* body, ...)
 {
-	AhatLogItemInfo log(src_file, body);
+    int count = 0;
+ 
+	va_list arglist;
+	va_start(arglist, body);
+
+	int len = _vscprintf(body, arglist) + 1;
+	char* tmp = new char[len];
+	memset(tmp, 0, len);
+
+	vsprintf_s(tmp, len, body, arglist);
+	
+	AhatLogItemInfo log(src_file, tmp);
+	delete tmp;
+	va_end(arglist);
 	
 	mutex.lock();
 	AhatLogger::q->push( std::pair<std::string, std::string>("INFO", log.message()));
 	mutex.unlock();
 }
 
-void AhatLogger::ERROR(std::string src_file, std::string body)
+void AhatLogger::ERROR(std::string src_file, char* body, ...)
 {
-	AhatLogItemError log(src_file, body);
+    int count = 0;
+ 
+	va_list arglist;
+	va_start(arglist, body);
+
+	int len = _vscprintf(body, arglist) + 1;
+	char* tmp = new char[len];
+	memset(tmp, 0, len);
+
+	vsprintf_s(tmp, len, body, arglist);
+	
+	AhatLogItemError log(src_file, tmp);
+	delete tmp;
+	va_end(arglist);
 	
 	mutex.lock();
 	AhatLogger::q->push( std::pair<std::string, std::string>("ERROR", log.message()));
 	mutex.unlock();
 }
 
-void AhatLogger::CUSTOM(std::string src_file, std::string custom, std::string body)
+void AhatLogger::CUSTOM(std::string src_file, std::string custom, char* body, ...)
 {
-	AhatLogItemCustom log(src_file, body);
+    int count = 0;
+ 
+	va_list arglist;
+	va_start(arglist, body);
+
+	int len = _vscprintf(body, arglist) + 1;
+	char* tmp = new char[len];
+	memset(tmp, 0, len);
+
+	vsprintf_s(tmp, len, body, arglist);
+	
+	AhatLogItemCustom log(src_file, tmp);
+	delete tmp;
+	va_end(arglist);
 	
 	mutex.lock();
 	AhatLogger::q->push( std::pair<std::string, std::string>(custom, log.message()));
 	mutex.unlock();
 }
 
-void AhatLogger::DEBUG(std::string src_file, std::string body)
+//로그레벨 0이면 로그를 작성 그 이상은 작성하지 않음
+void AhatLogger::DEBUG(std::string src_file, char* body, ...)
 {
-	if(level < 1)
+	if(level <= 1)
 		return;
+	
+    int count = 0;
+ 
+	va_list arglist;
+	va_start(arglist, body);
 
-	AhatLogItemDebug log(src_file, body);
+	int len = _vscprintf(body, arglist) + 1;
+	char* tmp = new char[len];
+	memset(tmp, 0, len);
+
+	vsprintf_s(tmp, len, body, arglist);
+	
+	AhatLogItemDebug log(src_file, tmp);
+	delete tmp;
+	va_end(arglist);
 	
 	mutex.lock();
 	AhatLogger::q->push( std::pair<std::string, std::string>("DEBUG", log.message()));
@@ -165,9 +218,9 @@ void AhatLogger::DB_ERROR(std::string src_file, InDBtem db_req_item, std::string
 	mutex.unlock();
 }
 
-void AhatLogger::IN_REQ(std::string src_file, InReqItem in_req_item, std::string in_req_body)
+void AhatLogger::IN_REQ(std::string src_file, InReqItem in_req_item, std::string in_res_body)
 {
-	AhatLogItemInReq log(src_file, in_req_item, in_req_body);
+	AhatLogItemInReq log(src_file, in_req_item, in_res_body);
 	
 	mutex.lock();
 	AhatLogger::q->push( std::pair<std::string, std::string>("IN_REQ", log.message()));
@@ -183,3 +236,15 @@ void AhatLogger::IN_REQ_ERR(std::string src_file, InReqItem in_req_item, std::st
 	mutex.unlock();
 }
 
+#ifdef __linux__
+int _vscprintf (const char * format, va_list pargs) 
+{ 
+    int retval; 
+    va_list argcopy; 
+    va_copy(argcopy, pargs); 
+	
+    retval = vsnprintf(NULL, 0, format, argcopy); 
+    va_end(argcopy); 
+    return retval; 
+}
+#endif
