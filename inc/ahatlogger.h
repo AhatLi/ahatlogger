@@ -57,11 +57,11 @@ public:
 	static void start();
 	static void stop();
 	
-	static void INFO(std::string src_file, char* body, ...);
-	static void ERROR(std::string src_file, char* body, ...);
-	static void DEBUG(std::string src_file, char* body, ...);
+	static void INFO(std::string src_file, const char* body, ...);
+	static void ERROR(std::string src_file, const char* body, ...);
+	static void DEBUG(std::string src_file, const char* body, ...);
 
-	static void CUSTOM(std::string src_file, std::string custom, char*, ...);
+	static void CUSTOM(std::string src_file, std::string custom, const char* body, ...);
 
 	static void REQUEST(std::string src_file, std::string req_ip, std::string req_uri);
 	static void RESPONSE(std::string src_file, std::string res_body, std::string res_code);

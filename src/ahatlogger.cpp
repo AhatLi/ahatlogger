@@ -92,7 +92,7 @@ void AhatLogger::setting(std::string path, int level)
 	AhatLogger::level = level;
 }
 
-void AhatLogger::INFO(std::string src_file, char* body, ...)
+void AhatLogger::INFO(std::string src_file, const char* body, ...)
 {
     int count = 0;
  
@@ -114,7 +114,7 @@ void AhatLogger::INFO(std::string src_file, char* body, ...)
 	mutex.unlock();
 }
 
-void AhatLogger::ERROR(std::string src_file, char* body, ...)
+void AhatLogger::ERROR(std::string src_file, const char* body, ...)
 {
     int count = 0;
  
@@ -136,7 +136,7 @@ void AhatLogger::ERROR(std::string src_file, char* body, ...)
 	mutex.unlock();
 }
 
-void AhatLogger::CUSTOM(std::string src_file, std::string custom, char* body, ...)
+void AhatLogger::CUSTOM(std::string src_file, std::string custom, const char* body, ...)
 {
     int count = 0;
  
@@ -159,7 +159,7 @@ void AhatLogger::CUSTOM(std::string src_file, std::string custom, char* body, ..
 }
 
 //로그레벨 0이면 로그를 작성 그 이상은 작성하지 않음
-void AhatLogger::DEBUG(std::string src_file, char* body, ...)
+void AhatLogger::DEBUG(std::string src_file, const char* body, ...)
 {
 	if(level <= 1)
 		return;
