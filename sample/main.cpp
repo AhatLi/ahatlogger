@@ -4,7 +4,7 @@
  
 int main()
 {
-	//setting( logfile path, loglevel )   loglevel 0 print debug log
+	//setting( logfile path, loglevel )
 	AhatLogger::setting("ahat.log", 1); 
 	AhatLogger::start();
 
@@ -12,6 +12,8 @@ int main()
 	{
 		AhatLogger::INFO(CODE, "infolog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
 		AhatLogger::ERROR(CODE, "errorlog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
+		
+		//   loglevel 0 print debug log
 		AhatLogger::DEBUG(CODE, "debuglog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
 
 		AhatLogger::CUSTOM(CODE, "AHAT", "debuglog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);

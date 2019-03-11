@@ -48,6 +48,7 @@ private:
 	static int level;
 
 	static void run();
+	static std::string getDate();
 	
 	static void logWrite();
 public:

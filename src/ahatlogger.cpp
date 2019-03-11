@@ -7,11 +7,28 @@ std::string		AhatLogger::path;
 std::mutex		AhatLogger::mutex;
 int				AhatLogger::level;
 
+
 std::string code(std::string file, std::string func, int line)
 {
 	std::stringstream buf;
 	buf<<file<<","<<func<<":"<<line;
 	return buf.str();
+}
+
+
+std::string AhatLogger::getDate()
+{
+	std::chrono::system_clock::time_point time = std::chrono::system_clock::now();
+	
+	time_t tt = std::chrono::system_clock::to_time_t(time);
+	struct tm tm;
+	localtime_s(&tm, &tt);
+ 
+	std::stringstream s;
+	s << tm.tm_year+1900 << "-" << std::setfill('0') << std::setw(2) << tm.tm_mon+1 << "-" << 
+		std::setfill('0') << std::setw(2) << tm.tm_mday;
+
+	return s.str();
 }
 
 void AhatLogger::start()
@@ -62,8 +79,14 @@ void AhatLogger::run()
 
 void AhatLogger::logWrite()
 {
+	std::string date = getDate();
 	std::ofstream f;
-	f.open(path, std::ios::out | std::ios::app);
+	std::string filepath = "";
+	
+	filepath += path;
+	filepath += ".";
+	filepath += date;
+	f.open(filepath, std::ios::out | std::ios::app);
 	
 	mutex.lock();
 
