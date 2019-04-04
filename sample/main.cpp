@@ -8,7 +8,7 @@ int main()
 	AhatLogger::setting("ahat.log", 1); 
 	AhatLogger::start();
 
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 100; i++)
 	{
 		AhatLogger::INFO(CODE, "infolog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
 		AhatLogger::ERROR(CODE, "errorlog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
@@ -27,6 +27,8 @@ int main()
 		//Network Request process
 		AhatLogger::IN_REQ(CODE, reqitem, "in_res_body");
 		AhatLogger::IN_REQ_ERR(CODE, reqitem, "in_res_body");
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	AhatLogger::stop();
 	return 0;
