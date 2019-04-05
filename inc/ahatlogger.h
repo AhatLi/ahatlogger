@@ -1,6 +1,10 @@
 #ifndef AHATLOGGER_H_
 #define AHATLOGGER_H_
 
+/*
+Ahat Logger Version 1.0.0
+*/
+
 #include <iostream>
 #include <thread>
 #include <string>
@@ -18,6 +22,9 @@
 
 #include <fcntl.h>
 #include <string.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "ahatloggeritem.h"
 
@@ -49,12 +56,15 @@ private:
 
 	static void run();
 	static std::string getDate();
+
+	static int makeDirectory(const char *full_path);
+	static bool existDirectory(const char *path);
 	
 	static void logWrite();
 public:
 	static std::mutex mutex;
-	
-	static void setting(std::string path, int level);
+
+	static void setting(std::string path, std::string name, int level);
 	static void start();
 	static void stop();
 	

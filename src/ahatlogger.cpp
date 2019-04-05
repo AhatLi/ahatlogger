@@ -4,6 +4,7 @@ std::queue< std::pair<std::string, std::string> > *	AhatLogger::q = NULL;
 bool			AhatLogger::isStarted = false;
 bool			AhatLogger::isFinished = false;
 std::string		AhatLogger::path;
+std::string		AhatLogger::name;
 std::mutex		AhatLogger::mutex;
 int				AhatLogger::level;
 
@@ -15,6 +16,55 @@ std::string code(std::string file, std::string func, int line)
 	return buf.str();
 }
 
+int AhatLogger::makeDirectory(const char *path)
+{
+	char tmp_path[2048];
+	const char *tmp = path;
+	int  len  = 0;
+	int  ret;
+
+	while((tmp = strchr(tmp, '/')) != NULL) 
+	{
+		len = tmp - path;
+		tmp++;
+		if(len == 0) 
+		{
+			continue;
+		}
+
+		strncpy(tmp_path, path, len);
+		tmp_path[len] = 0x00;
+		if(existDirectory(tmp_path))
+		{
+			continue;
+		}
+
+		if((ret = mkdir(tmp_path, S_IFDIR | S_IRWXU | S_IRWXG | S_IXOTH | S_IROTH)) == -1) 
+		{
+			return -1;
+		}
+	}
+	return mkdir(path, S_IFDIR | S_IRWXU | S_IRWXG | S_IXOTH | S_IROTH);
+}
+
+bool AhatLogger::existDirectory(const char *path)
+{
+	if ( path == NULL) 
+		return false;
+
+	DIR *pDir;
+	bool bExists = false;
+
+	pDir = opendir (path);
+
+	if (pDir != NULL)
+	{
+		bExists = true;    
+		(void) closedir (pDir);
+	}
+
+	return bExists;
+}
 
 std::string AhatLogger::getDate()
 {
@@ -84,6 +134,9 @@ void AhatLogger::logWrite()
 	std::string filepath = "";
 	
 	filepath += path;
+	if(filepath != "")
+		filepath += "/";
+	filepath += name;
 	filepath += ".";
 	filepath += date;
 	f.open(filepath, std::ios::out | std::ios::app);
@@ -109,9 +162,18 @@ void AhatLogger::logWrite()
 	f.close();
 }
 
-void AhatLogger::setting(std::string path, int level)
+void AhatLogger::setting(std::string path, std::string filename, int level)
 {
 	AhatLogger::path = path;
+	if(!existDirectory(path.c_str()))
+	{
+		if(makeDirectory(path.c_str()) == -1)
+		{
+			AhatLogger::path = "";
+		}
+	}
+
+	AhatLogger::name = filename;
 	AhatLogger::level = level;
 }
 

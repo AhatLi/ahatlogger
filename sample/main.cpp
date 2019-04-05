@@ -4,11 +4,11 @@
  
 int main()
 {
-	//setting( logfile path, loglevel )
-	AhatLogger::setting("ahat.log", 1); 
+	//setting( logfile path, logfile name, loglevel )
+	AhatLogger::setting("", "ahatlogtest", 1); 
 	AhatLogger::start();
 
-	for(int i = 0; i < 100; i++)
+	for(int i = 0; i < 10; i++)
 	{
 		AhatLogger::INFO(CODE, "infolog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
 		AhatLogger::ERROR(CODE, "errorlog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);

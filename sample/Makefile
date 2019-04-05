@@ -17,7 +17,7 @@ endif
 
 all : ${TARGET}
 
-$(TARGET) :
+$(TARGET) : main.cpp
 	$(CC) -o $@ $(SRC) $(INCLUDEDIR) $(LIBDIR) $(LIB) $(ETC)
 
 clean :
