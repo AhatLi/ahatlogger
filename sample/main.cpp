@@ -5,7 +5,7 @@
 int main()
 {
 	//setting( logfile path, logfile name, loglevel )
-	AhatLogger::setting("", "ahatlogtest", 1); 
+	AhatLogger::setting("", "ahatlogtest", 0); 
 	AhatLogger::start();
 
 	for(int i = 0; i < 10; i++)
@@ -22,11 +22,15 @@ int main()
 		//DB Request process
 		AhatLogger::DB(CODE, dbitem, "db_res_body");
 		AhatLogger::DB_ERROR(CODE, dbitem, "db_res_body");
+		AhatLogger::DB_DEBUG(CODE, dbitem, "db_res_body");
+		AhatLogger::DB_ERROR_DEBUG(CODE, dbitem, "db_res_body");
 
 		InReqItem reqitem("in_req_ip", "in_req_port", "in_req_url", "in_req_body");
 		//Network Request process
 		AhatLogger::IN_REQ(CODE, reqitem, "in_res_body");
 		AhatLogger::IN_REQ_ERR(CODE, reqitem, "in_res_body");
+		AhatLogger::IN_REQ_DEBUG(CODE, reqitem, "in_res_body");
+		AhatLogger::IN_REQ_ERR_DEBUG(CODE, reqitem, "in_res_body");
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
