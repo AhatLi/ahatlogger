@@ -35,23 +35,7 @@ AhatLogItemDB::AhatLogItemDB(std::string src_file, InDBtem db_req_item, std::str
 	this->db_res_body = db_res_body;
 }
 
-AhatLogItemDBError::AhatLogItemDBError(std::string src_file, InDBtem db_req_item, std::string db_res_body)
-{
-	this->src_file = src_file;
-	this->db_res_time = getCurTime();
-	this->db_req_item = db_req_item;
-	this->db_res_body = db_res_body;
-}
-
 AhatLogItemInReq::AhatLogItemInReq(std::string src_file, InReqItem in_req_item, std::string in_res_body)
-{
-	this->src_file = src_file;
-	this->in_res_time = getCurTime();
-	this->in_req_item = in_req_item;
-	this->in_res_body = in_res_body;
-}
-
-AhatLogItemInReqError::AhatLogItemInReqError(std::string src_file, InReqItem in_req_item, std::string in_res_body)
 {
 	this->src_file = src_file;
 	this->in_res_time = getCurTime();

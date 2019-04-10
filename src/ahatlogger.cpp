@@ -246,7 +246,7 @@ void AhatLogger::CUSTOM(std::string src_file, std::string custom, const char* bo
 //로그레벨 0이면 로그를 작성 그 이상은 작성하지 않음
 void AhatLogger::DEBUG(std::string src_file, const char* body, ...)
 {
-	if(level <= 1)
+	if(level != 0)
 		return;
 	
     int count = 0;
@@ -296,15 +296,38 @@ void AhatLogger::DB(std::string src_file, InDBtem db_req_item, std::string db_re
 }
 void AhatLogger::DB_ERROR(std::string src_file, InDBtem db_req_item, std::string db_res_body)
 {
-	AhatLogItemDBError log(src_file, db_req_item, db_res_body);
+	AhatLogItemDB log(src_file, db_req_item, db_res_body);
 	
 	mutex.lock();
 	AhatLogger::q->push( std::pair<std::string, std::string>("DB_ERROR", log.message()));
 	mutex.unlock();
 }
 
-void AhatLogger::IN_REQ(std::string src_file, InReqItem in_req_item, std::string in_res_body)
+void AhatLogger::DB_DEBUG(std::string src_file, InDBtem db_req_item, std::string db_res_body)
 {
+	if(level != 0)
+		return;
+	
+	AhatLogItemDB log(src_file, db_req_item, db_res_body);
+	
+	mutex.lock();
+	AhatLogger::q->push( std::pair<std::string, std::string>("DB_DEBUG", log.message()));
+	mutex.unlock();
+}
+void AhatLogger::DB_ERROR_DEBUG(std::string src_file, InDBtem db_req_item, std::string db_res_body)
+{
+	if(level != 0)
+		return;
+	
+	AhatLogItemDB log(src_file, db_req_item, db_res_body);
+	
+	mutex.lock();
+	AhatLogger::q->push( std::pair<std::string, std::string>("DB_ERROR_DEBUG", log.message()));
+	mutex.unlock();
+}
+
+void AhatLogger::IN_REQ(std::string src_file, InReqItem in_req_item, std::string in_res_body)
+{	
 	AhatLogItemInReq log(src_file, in_req_item, in_res_body);
 	
 	mutex.lock();
@@ -314,10 +337,34 @@ void AhatLogger::IN_REQ(std::string src_file, InReqItem in_req_item, std::string
 
 void AhatLogger::IN_REQ_ERR(std::string src_file, InReqItem in_req_item, std::string in_res_body)
 {
-	AhatLogItemInReqError log(src_file, in_req_item, in_res_body);
+	AhatLogItemInReq log(src_file, in_req_item, in_res_body);
 	
 	mutex.lock();
 	AhatLogger::q->push( std::pair<std::string, std::string>("IN_REQ_ERR", log.message()));
+	mutex.unlock();
+}
+
+void AhatLogger::IN_REQ_DEBUG(std::string src_file, InReqItem in_req_item, std::string in_res_body)
+{
+	if(level != 0)
+		return;
+	
+	AhatLogItemInReq log(src_file, in_req_item, in_res_body);
+	
+	mutex.lock();
+	AhatLogger::q->push( std::pair<std::string, std::string>("IN_REQ_DEBUG", log.message()));
+	mutex.unlock();
+}
+
+void AhatLogger::IN_REQ_ERR_DEBUG(std::string src_file, InReqItem in_req_item, std::string in_res_body)
+{
+	if(level != 0)
+		return;
+	
+	AhatLogItemInReq log(src_file, in_req_item, in_res_body);
+	
+	mutex.lock();
+	AhatLogger::q->push( std::pair<std::string, std::string>("IN_REQ_ERR_DEBUG", log.message()));
 	mutex.unlock();
 }
 

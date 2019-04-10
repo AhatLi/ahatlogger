@@ -2,7 +2,7 @@
 #define AHATLOGGER_H_
 
 /*
-Ahat Logger Version 1.0.0
+Ahat Logger Version 1.0.0.QR2
 */
 
 #include <iostream>
