@@ -2,7 +2,7 @@
 #define AHATLOGGER_H_
 
 /*
-Ahat Logger Version 1.0.1.QR1
+Ahat Logger Version 1.0.1.QR2
 */
 
 #include <iostream>
@@ -71,7 +71,7 @@ public:
 	static void stop();
 	
 	static void INFO(std::string src_file, const char* body, ...);
-	static void ERROR(std::string src_file, const char* body, ...);
+	static void ERR(std::string src_file, const char* body, ...);
 	static void DEBUG(std::string src_file, const char* body, ...);
 
 	static void CUSTOM(std::string src_file, std::string custom, const char* body, ...);

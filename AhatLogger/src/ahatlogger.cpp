@@ -237,7 +237,7 @@ void AhatLogger::INFO(std::string src_file, const char* body, ...)
 	mutex.unlock();
 }
 
-void AhatLogger::ERROR(std::string src_file, const char* body, ...)
+void AhatLogger::ERR(std::string src_file, const char* body, ...)
 {
     int count = 0;
  
