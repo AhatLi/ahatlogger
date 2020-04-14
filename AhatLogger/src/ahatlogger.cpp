@@ -332,7 +332,7 @@ void AhatLogger::DB(std::string src_file, InDBtem db_req_item, std::string db_re
 	AhatLogger::q->push( std::pair<std::string, std::string>("DB", log.message()));
 	mutex.unlock();
 }
-void AhatLogger::DB_ERROR(std::string src_file, InDBtem db_req_item, std::string db_res_body)
+void AhatLogger::DB_ERR(std::string src_file, InDBtem db_req_item, std::string db_res_body)
 {
 	AhatLogItemDB log(src_file, db_req_item, db_res_body);
 	
@@ -352,7 +352,7 @@ void AhatLogger::DB_DEBUG(std::string src_file, InDBtem db_req_item, std::string
 	AhatLogger::q->push( std::pair<std::string, std::string>("DB_DEBUG", log.message()));
 	mutex.unlock();
 }
-void AhatLogger::DB_ERROR_DEBUG(std::string src_file, InDBtem db_req_item, std::string db_res_body)
+void AhatLogger::DB_ERR_DEBUG(std::string src_file, InDBtem db_req_item, std::string db_res_body)
 {
 	if(level != 0)
 		return;

@@ -80,9 +80,9 @@ public:
 	static void RESPONSE(std::string src_file, std::string res_body, std::string res_code);
 
 	static void DB(std::string src_file, InDBtem db_req_item, std::string db_res_body);
-	static void DB_ERROR(std::string src_file, InDBtem db_req_item, std::string db_res_body);
+	static void DB_ERR(std::string src_file, InDBtem db_req_item, std::string db_res_body);
 	static void DB_DEBUG(std::string src_file, InDBtem db_req_item, std::string db_res_body);
-	static void DB_ERROR_DEBUG(std::string src_file, InDBtem db_req_item, std::string db_res_body);
+	static void DB_ERR_DEBUG(std::string src_file, InDBtem db_req_item, std::string db_res_body);
 	
 	static void IN_REQ(std::string src_file, InReqItem in_req_item, std::string in_res_body);
 	static void IN_REQ_ERR(std::string src_file, InReqItem in_req_item, std::string in_res_body);
