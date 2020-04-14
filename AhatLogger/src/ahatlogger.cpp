@@ -34,17 +34,42 @@ int AhatLogger::makeDirectory(const char *path)
 
 		strncpy(tmp_path, path, len);
 		tmp_path[len] = 0x00;
-		if(existDirectory(tmp_path))
+		if (existDirectory(tmp_path))
 		{
 			continue;
 		}
 
-		if((ret = mkdir(tmp_path, S_IFDIR | S_IRWXU | S_IRWXG | S_IXOTH | S_IROTH)) == -1) 
+#ifdef _WIN32
+		size_t tn;
+		wchar_t* pwstr = new wchar_t(sizeof(wchar_t) * (len + 1));
+		mbstowcs_s(&tn, pwstr, len + 1, tmp_path, len + 1);
+
+		if ((ret = _wmkdir(pwstr)) == -1)
+		{
+			delete pwstr;
+			return -1;
+		}
+		delete pwstr;
+#elif __linux__
+		if ((ret = mkdir(tmp_path, S_IFDIR | S_IRWXU | S_IRWXG | S_IXOTH | S_IROTH)) == -1)
 		{
 			return -1;
 		}
+#endif
 	}
+
+#ifdef _WIN32
+	size_t tn;
+	wchar_t* pwstr = new wchar_t(sizeof(wchar_t) * (len + 1));
+	mbstowcs_s(&tn, pwstr, len + 1, tmp_path, len + 1);
+
+	ret = _wmkdir(pwstr);
+	delete pwstr;
+
+	return ret;
+#elif __linux__
 	return mkdir(path, S_IFDIR | S_IRWXU | S_IRWXG | S_IXOTH | S_IROTH);
+#endif
 }
 
 bool AhatLogger::existDirectory(const char *path)
@@ -52,9 +77,22 @@ bool AhatLogger::existDirectory(const char *path)
 	if ( path == NULL) 
 		return false;
 
-	DIR *pDir;
 	bool bExists = false;
+#ifdef _WIN32
+	FILE *f = NULL;
+	fopen_s(&f, path, "r");
+	if (f == NULL)
+	{
+		bExists = true;
+	}
+	else
+	{
+		fclose(f);
+		bExists = false;
+	}
 
+#elif __linux__
+	DIR *pDir;
 	pDir = opendir (path);
 
 	if (pDir != NULL)
@@ -62,7 +100,7 @@ bool AhatLogger::existDirectory(const char *path)
 		bExists = true;    
 		(void) closedir (pDir);
 	}
-
+#endif
 	return bExists;
 }
 

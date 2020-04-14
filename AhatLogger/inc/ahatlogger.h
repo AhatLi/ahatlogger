@@ -22,18 +22,20 @@ Ahat Logger Version 1.0.0.QR2
 
 #include <fcntl.h>
 #include <string.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include "ahatloggeritem.h"
 
-#ifdef __linux__
-#define __FILENAME__    __FILE__
+#ifdef _WIN32
+#include <tchar.h>
+#define strncpy(X, Y, Z) strncpy_s(X, Y, Z)
+#define __FILENAME__    strrchr(__FILE__, '\\') +1
+#elif __linux__
+#include <dirent.h>
 #define vsprintf_s(W, X, Y, Z) vsprintf(W, Y, Z)
 int _vscprintf (const char * format, va_list pargs);
-#else
-#define __FILENAME__    strrchr(__FILE__, '\\') +1
+#define __FILENAME__    __FILE__
 #endif
 
 #define CODE code(__FILENAME__, __FUNCTION__, __LINE__)
