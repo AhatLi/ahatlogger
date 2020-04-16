@@ -175,8 +175,8 @@ void AhatLogger::logWrite()
 	if(filepath != "")
 		filepath += "/";
 	filepath += name;
-	filepath += ".";
 	filepath += date;
+	filepath += ".log";
 	f.open(filepath, std::ios::out | std::ios::app);
 	
 	mutex.lock();
@@ -202,16 +202,35 @@ void AhatLogger::logWrite()
 
 void AhatLogger::setting(std::string path, std::string filename, int level)
 {
-	AhatLogger::path = path;
-	if(!existDirectory(path.c_str()))
+	if (path.empty())
 	{
-		if(makeDirectory(path.c_str()) == -1)
+#ifdef _WIN32
+		wchar_t tmp[256];
+		int len = GetModuleFileName(NULL, tmp, MAX_PATH);
+		std::wstring ws(tmp);
+		std::string buf(ws.begin(), ws.end());
+		buf = buf.substr(0, buf.find_last_of("\\"));
+#elif __linux__
+		char buf[256];
+		int len = readlink("/proc/self/exe", buf, 256);
+		buf[len] = '\0';
+#endif
+		AhatLogger::path = buf;
+	}
+	else
+	{
+		AhatLogger::path = path;
+	}
+	if (!existDirectory(path.c_str()))
+	{
+		if (makeDirectory(path.c_str()) == -1)
 		{
 			AhatLogger::path = "";
 		}
 	}
 
 	AhatLogger::name = filename;
+	AhatLogger::name += "_";
 	AhatLogger::level = level;
 }
 
