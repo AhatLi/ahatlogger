@@ -41,7 +41,17 @@ int _vscprintf (const char * format, va_list pargs);
 #define __FILENAME__    __FILE__
 #endif
 
+
+#ifdef _WIN32
+	#ifdef __MINGW32__
+#define CODE code(__FILE__, __FUNCTION__, __LINE__)
+	#elif
 #define CODE code(__FILENAME__, __FUNCTION__, __LINE__)
+	#endif
+#elif __linux__
+#define CODE code(__FILE__, __FUNCTION__, __LINE__)
+#endif
+
 
 std::string code(std::string file, std::string func, int line);
 

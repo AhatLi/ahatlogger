@@ -1,4 +1,5 @@
 #include "ahatlogger.h"
+#include <algorithm>
 
 std::queue< std::pair<std::string, std::string> > *	AhatLogger::q = NULL;
 bool			AhatLogger::isStarted = false;
@@ -177,7 +178,14 @@ void AhatLogger::logWrite()
 	filepath += name;
 	filepath += date;
 	filepath += ".log";
+
 	f.open(filepath, std::ios::out | std::ios::app);
+	
+    if (f.fail()) 
+	{
+		std::cout<<"logWrite Fail!"<<path.c_str()<<"\n";
+		return;
+	}
 	
 	mutex.lock();
 
@@ -205,11 +213,18 @@ void AhatLogger::setting(std::string path, std::string filename, int level)
 	if (path.empty())
 	{
 #ifdef _WIN32
+	#ifdef __MINGW32__
+		char tmp[256];
+		int len = GetModuleFileName(NULL, tmp, MAX_PATH);
+		std::string buf = tmp;
+		buf = buf.substr(0, buf.find_last_of("\\"));
+	#elif
 		wchar_t tmp[256];
 		int len = GetModuleFileName(NULL, tmp, MAX_PATH);
 		std::wstring ws(tmp);
 		std::string buf(ws.begin(), ws.end());
 		buf = buf.substr(0, buf.find_last_of("\\"));
+	#endif
 #elif __linux__
 		char buf[256];
 		int len = readlink("/proc/self/exe", buf, 256);
@@ -221,6 +236,9 @@ void AhatLogger::setting(std::string path, std::string filename, int level)
 	{
 		AhatLogger::path = path;
 	}
+
+	std::replace( AhatLogger::path.begin(), AhatLogger::path.end(), '\\', '/');
+
 	if (!existDirectory(path.c_str()))
 	{
 		if (makeDirectory(path.c_str()) == -1)
@@ -300,7 +318,7 @@ void AhatLogger::CUSTOM(std::string src_file, std::string custom, const char* bo
 	mutex.unlock();
 }
 
-//·Î±×·¹º§ 0ÀÌ¸é ·Î±×¸¦ ÀÛ¼º ±× ÀÌ»óÀº ÀÛ¼ºÇÏÁö ¾ÊÀ½
+//ë¡œê·¸ë ˆë²¨ 0ì´ë©´ ë¡œê·¸ë¥¼ ìž‘ì„± ê·¸ ì´ìƒì€ ìž‘ì„±í•˜ì§€ ì•ŠìŒ
 void AhatLogger::DEBUG(std::string src_file, const char* body, ...)
 {
 	if(level != 0)
