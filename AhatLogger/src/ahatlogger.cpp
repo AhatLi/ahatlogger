@@ -218,7 +218,7 @@ void AhatLogger::setting(std::string path, std::string filename, int level)
 		int len = GetModuleFileName(NULL, tmp, MAX_PATH);
 		std::string buf = tmp;
 		buf = buf.substr(0, buf.find_last_of("\\"));
-	#elif
+	#else
 		wchar_t tmp[256];
 		int len = GetModuleFileName(NULL, tmp, MAX_PATH);
 		std::wstring ws(tmp);

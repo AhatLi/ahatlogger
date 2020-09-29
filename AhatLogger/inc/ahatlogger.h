@@ -45,7 +45,7 @@ int _vscprintf (const char * format, va_list pargs);
 #ifdef _WIN32
 	#ifdef __MINGW32__
 #define CODE code(__FILE__, __FUNCTION__, __LINE__)
-	#elif
+	#else
 #define CODE code(__FILENAME__, __FUNCTION__, __LINE__)
 	#endif
 #elif __linux__
