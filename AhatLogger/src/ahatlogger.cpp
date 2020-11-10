@@ -1,13 +1,15 @@
 #include "ahatlogger.h"
 #include <algorithm>
 
-std::queue< std::pair<std::string, std::string> > *	AhatLogger::q = NULL;
+std::shared_ptr< std::queue< std::pair<std::string, std::string> > > AhatLogger::q = NULL;
 bool			AhatLogger::isStarted = false;
 bool			AhatLogger::isFinished = false;
 std::string		AhatLogger::path;
 std::string		AhatLogger::name;
 std::mutex		AhatLogger::mutex;
 int				AhatLogger::level;
+std::string		AhatLogger::curPath;
+std::ofstream	AhatLogger::f;
 
 
 std::string code(std::string file, std::string func, int line)
@@ -122,13 +124,45 @@ std::string AhatLogger::getDate()
 
 void AhatLogger::start()
 {
+	curPath = "";
 	if(isStarted == false)
 	{
 		isStarted = true;
-		q = new std::queue< std::pair<std::string, std::string> >();
+		logOpen();
+
+		q = std::make_shared<std::queue< std::pair<std::string, std::string> > >();
 		std::thread t(&AhatLogger::run);
 		t.detach();
 	}
+}
+
+bool AhatLogger::logOpen()
+{
+	std::string date = getDate();
+	std::string filepath = "";
+
+	filepath += path;
+	if (filepath != "")
+		filepath += "/";
+	filepath += name;
+	filepath += date;
+	filepath += ".log";
+	curPath = filepath;
+
+	f.open(filepath, std::ios::out | std::ios::app);
+	if (f.fail())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool AhatLogger::logClose()
+{
+	f.close();
+
+	return true;
 }
 
 void AhatLogger::stop()
@@ -155,8 +189,13 @@ void AhatLogger::run()
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			continue;
 		}
-		
-		logWrite();
+		else
+		{
+			if (!logWrite())
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		}
 	}
 	if(q->size())
 	{
@@ -166,10 +205,9 @@ void AhatLogger::run()
 	isFinished = true;
 }
 
-void AhatLogger::logWrite()
+bool AhatLogger::logWrite()
 {
 	std::string date = getDate();
-	std::ofstream f;
 	std::string filepath = "";
 	
 	filepath += path;
@@ -179,18 +217,16 @@ void AhatLogger::logWrite()
 	filepath += date;
 	filepath += ".log";
 
-	f.open(filepath, std::ios::out | std::ios::app);
-	
-    if (f.fail()) 
+	if (curPath.compare(filepath) != 0)
 	{
-		std::cout<<"logWrite Fail!"<<path.c_str()<<"\n";
-		return;
+		logClose();
+		logOpen();
 	}
 	
 	mutex.lock();
 
-	std::queue< std::pair<std::string, std::string> > *qq = q;
-	q = new std::queue< std::pair<std::string, std::string> >();
+	auto qq = q;
+	q = std::make_shared<std::queue< std::pair<std::string, std::string> > >();
 
 	mutex.unlock();
 
@@ -200,12 +236,11 @@ void AhatLogger::logWrite()
 		std::pair<std::string, std::string>  item = qq->front();
 		qq->pop();
 
-		f << item.first<< "," << getCurTime() << item.second << "\n";
+		f << item.first << "," << getCurTime() << item.second << "\n";
 	}
-	
-	delete qq;
+	f.flush();
 		
-	f.close();
+	return true;
 }
 
 void AhatLogger::setting(std::string path, std::string filename, int level)
@@ -219,11 +254,13 @@ void AhatLogger::setting(std::string path, std::string filename, int level)
 		std::string buf = tmp;
 		buf = buf.substr(0, buf.find_last_of("\\"));
 	#else
+		/*
 		wchar_t tmp[256];
 		int len = GetModuleFileName(NULL, tmp, MAX_PATH);
 		std::wstring ws(tmp);
-		std::string buf(ws.begin(), ws.end());
 		buf = buf.substr(0, buf.find_last_of("\\"));
+		*/
+		std::string buf(".");
 	#endif
 #elif __linux__
 		char buf[256];
@@ -266,7 +303,7 @@ void AhatLogger::INFO(std::string src_file, const char* body, ...)
 	vsprintf_s(tmp, len, body, arglist);
 	
 	AhatLogItemInfo log(src_file, tmp);
-	delete tmp;
+	delete []tmp;
 	va_end(arglist);
 	
 	mutex.lock();
@@ -288,7 +325,7 @@ void AhatLogger::ERR(std::string src_file, const char* body, ...)
 	vsprintf_s(tmp, len, body, arglist);
 	
 	AhatLogItemError log(src_file, tmp);
-	delete tmp;
+	delete []tmp;
 	va_end(arglist);
 	
 	mutex.lock();
@@ -310,7 +347,7 @@ void AhatLogger::CUSTOM(std::string src_file, std::string custom, const char* bo
 	vsprintf_s(tmp, len, body, arglist);
 	
 	AhatLogItemCustom log(src_file, tmp);
-	delete tmp;
+	delete []tmp;
 	va_end(arglist);
 	
 	mutex.lock();
@@ -336,7 +373,7 @@ void AhatLogger::DEBUG(std::string src_file, const char* body, ...)
 	vsprintf_s(tmp, len, body, arglist);
 	
 	AhatLogItemDebug log(src_file, tmp);
-	delete tmp;
+	delete []tmp;
 	va_end(arglist);
 	
 	mutex.lock();

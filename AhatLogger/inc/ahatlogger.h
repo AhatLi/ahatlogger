@@ -41,17 +41,7 @@ int _vscprintf (const char * format, va_list pargs);
 #define __FILENAME__    __FILE__
 #endif
 
-
-#ifdef _WIN32
-	#ifdef __MINGW32__
-#define CODE code(__FILE__, __FUNCTION__, __LINE__)
-	#else
 #define CODE code(__FILENAME__, __FUNCTION__, __LINE__)
-	#endif
-#elif __linux__
-#define CODE code(__FILE__, __FUNCTION__, __LINE__)
-#endif
-
 
 std::string code(std::string file, std::string func, int line);
 
@@ -59,26 +49,31 @@ class AhatLogger
 {
 private:
 	static std::string path;
+	static std::string curPath;
 
 	static std::string name;
 	static std::string version;
 	static std::string host;
+	static std::ofstream f;
 	
-	static std::queue< std::pair<std::string, std::string> > *q;
+	static std::shared_ptr< std::queue< std::pair<std::string, std::string> > > q;
 	static bool isStarted;
 	static bool isFinished;
 	static int level;
 
 	static void run();
-	static std::string getDate();
 
 	static int makeDirectory(const char *full_path);
 	static bool existDirectory(const char *path);
 	
-	static void logWrite();
+	static bool logWrite();
+
+	static bool logOpen();
+	static bool logClose();
 public:
 	static std::mutex mutex;
 
+	static std::string getDate();
 	static void setting(std::string path, std::string name, int level);
 	static void start();
 	static void stop();
