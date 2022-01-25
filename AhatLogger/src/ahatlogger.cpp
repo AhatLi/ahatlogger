@@ -10,7 +10,9 @@ std::mutex		AhatLogger::mutex;
 int				AhatLogger::level;
 std::string		AhatLogger::curPath;
 std::ofstream	AhatLogger::f;
-
+unsigned int	AhatLogger::logSize;
+int				AhatLogger::logNumber;
+std::string		AhatLogger::logDate;
 
 std::string code(std::string file, std::string func, int line)
 {
@@ -122,9 +124,76 @@ std::string AhatLogger::getDate()
 	return s.str();
 }
 
+bool AhatLogger::logChanged(bool loop)
+{
+	std::string date = getDate();
+	if(logDate.compare(date) != 0)
+	{
+		logNumber = 0;
+		logSize = 0;
+		logDate = date;
+	}
+	else if(logSize > MAX_FILE_SIZE)
+	{
+		logNumber++;
+	}
+	else if(!loop)
+	{
+		return false;
+	}
+
+	std::string filename = makeFilename();
+    struct stat sb{};
+
+    if (!stat(filename.c_str(), &sb)) 
+	{
+		logSize = static_cast<int>(sb.st_size);
+		if(logSize > MAX_FILE_SIZE)
+		{
+			logChanged(true);
+		}
+    }
+	else
+	{
+		logSize = 0;
+	}
+
+	return true;
+}
+
+std::string AhatLogger::makeFilename()
+{
+	std::string date = getDate();
+	std::string filepath = "";
+
+	filepath += path;
+	if (filepath != "")
+		filepath += "/";
+	filepath = filepath + name + "_" + date + "__" + std::to_string(logNumber) + ".log";
+	
+	return filepath;
+}
+
+#ifdef __linux__
+void AhatLogger::makeSymlinkFile()
+{
+	std::string filepath = "";
+	filepath += path;
+	if (filepath != "")
+		filepath += "/";
+	filepath += name;
+	filepath += ".log";
+	
+    if (symlink(makeFilename().c_str(), filepath.c_str()) < 0) 
+	{
+		std::remove(filepath.c_str()); 
+		symlink(makeFilename().c_str(), filepath.c_str());
+    }
+}
+#endif
+
 void AhatLogger::start()
 {
-	curPath = "";
 	if(isStarted == false)
 	{
 		isStarted = true;
@@ -138,22 +207,16 @@ void AhatLogger::start()
 
 bool AhatLogger::logOpen()
 {
-	std::string date = getDate();
-	std::string filepath = "";
-
-	filepath += path;
-	if (filepath != "")
-		filepath += "/";
-	filepath += name;
-	filepath += date;
-	filepath += ".log";
-	curPath = filepath;
-
-	f.open(filepath, std::ios::out | std::ios::app);
+	f.open(makeFilename(), std::ios::out | std::ios::app);
 	if (f.fail())
 	{
 		return false;
 	}
+
+#ifdef __linux__
+	std::cout<<"makeFilename() "<<makeFilename()<<"\n";
+	makeSymlinkFile();
+#endif
 
 	return true;
 }
@@ -207,17 +270,7 @@ void AhatLogger::run()
 
 bool AhatLogger::logWrite()
 {
-	std::string date = getDate();
-	std::string filepath = "";
-	
-	filepath += path;
-	if(filepath != "")
-		filepath += "/";
-	filepath += name;
-	filepath += date;
-	filepath += ".log";
-
-	if (curPath.compare(filepath) != 0)
+	if (logChanged(false))
 	{
 		logClose();
 		logOpen();
@@ -237,6 +290,8 @@ bool AhatLogger::logWrite()
 		qq->pop();
 
 		f << item.first << "," << getCurTime() << item.second << "\n";
+
+		logSize = logSize + item.first.size() + 25 + item.second.size();
 	}
 	f.flush();
 		
@@ -285,8 +340,9 @@ void AhatLogger::setting(std::string path, std::string filename, int level)
 	}
 
 	AhatLogger::name = filename;
-	AhatLogger::name += "_";
 	AhatLogger::level = level;
+	AhatLogger::logSize = 0;
+	AhatLogger::logNumber = 0;
 }
 
 void AhatLogger::INFO(std::string src_file, const char* body, ...)

@@ -30,7 +30,6 @@ Ahat Logger Version 1.0.1.QR3
 #ifdef _WIN32
 #include <tchar.h>
 #include <windows.h>
-
 #define strncpy(X, Y, Z) strncpy_s(X, Y, Z)
 #define __FILENAME__    strrchr(__FILE__, '\\') +1
 #elif __linux__
@@ -41,6 +40,7 @@ int _vscprintf (const char * format, va_list pargs);
 #define __FILENAME__    __FILE__
 #endif
 
+#define MAX_FILE_SIZE 1024*1024*5
 #define CODE code(__FILENAME__, __FUNCTION__, __LINE__)
 
 std::string code(std::string file, std::string func, int line);
@@ -60,6 +60,9 @@ private:
 	static bool isStarted;
 	static bool isFinished;
 	static int level;
+	static unsigned int logSize;
+	static int logNumber;
+	static std::string logDate;
 
 	static void run();
 
@@ -68,8 +71,15 @@ private:
 	
 	static bool logWrite();
 
+	static std::string makeFilename();
+	static bool logChanged(bool loop);
 	static bool logOpen();
 	static bool logClose();
+
+#ifdef __linux__
+	static void makeSymlinkFile();
+#endif
+
 public:
 	static std::mutex mutex;
 
