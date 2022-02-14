@@ -214,7 +214,6 @@ bool AhatLogger::logOpen()
 	}
 
 #ifdef __linux__
-	std::cout<<"makeFilename() "<<makeFilename()<<"\n";
 	makeSymlinkFile();
 #endif
 
