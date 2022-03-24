@@ -26,7 +26,7 @@ int AhatLogger::makeDirectory(const char *path)
 	char tmp_path[2048];
 	const char *tmp = path;
 	int  len  = 0;
-	int  ret;
+	int  ret = 0;
 
 	while((tmp = strchr(tmp, '/')) != NULL) 
 	{
@@ -45,16 +45,7 @@ int AhatLogger::makeDirectory(const char *path)
 		}
 
 #ifdef _WIN32
-		size_t tn;
-		wchar_t* pwstr = new wchar_t(sizeof(wchar_t) * (len + 1));
-		mbstowcs_s(&tn, pwstr, len + 1, tmp_path, len + 1);
-
-		if ((ret = _wmkdir(pwstr)) == -1)
-		{
-			delete pwstr;
-			return -1;
-		}
-		delete pwstr;
+		CreateDirectoryA(tmp_path, NULL);
 #elif __linux__
 		if ((ret = mkdir(tmp_path, S_IFDIR | S_IRWXU | S_IRWXG | S_IXOTH | S_IROTH)) == -1)
 		{
@@ -64,13 +55,7 @@ int AhatLogger::makeDirectory(const char *path)
 	}
 
 #ifdef _WIN32
-	size_t tn;
-	wchar_t* pwstr = new wchar_t(sizeof(wchar_t) * (len + 1));
-	mbstowcs_s(&tn, pwstr, len + 1, tmp_path, len + 1);
-
-	ret = _wmkdir(pwstr);
-	delete pwstr;
-
+	CreateDirectoryA(path, NULL);
 	return ret;
 #elif __linux__
 	return mkdir(path, S_IFDIR | S_IRWXU | S_IRWXG | S_IXOTH | S_IROTH);
@@ -79,20 +64,20 @@ int AhatLogger::makeDirectory(const char *path)
 
 bool AhatLogger::existDirectory(const char *path)
 {
-	if ( path == NULL) 
+	if (path == NULL) 
 		return false;
 
 	bool bExists = false;
 #ifdef _WIN32
-	FILE *f = NULL;
-	fopen_s(&f, path, "r");
-	if (f == NULL)
+	FILE *ff = NULL;
+	fopen_s(&ff, path, "r");
+	if (ff != NULL)
 	{
 		bExists = true;
+		fclose(ff);
 	}
 	else
 	{
-		fclose(f);
 		bExists = false;
 	}
 
@@ -178,9 +163,6 @@ std::string AhatLogger::makeFilename()
 void AhatLogger::makeSymlinkFile()
 {
 	std::string filepath = "";
-	filepath += path;
-	if (filepath != "")
-		filepath += "/";
 	filepath += name;
 	filepath += ".log";
 	
@@ -214,7 +196,6 @@ bool AhatLogger::logOpen()
 	}
 
 #ifdef __linux__
-	std::cout<<"makeFilename() "<<makeFilename()<<"\n";
 	makeSymlinkFile();
 #endif
 
@@ -286,6 +267,14 @@ bool AhatLogger::logWrite()
 	int size = qq->size();
 	for(int i = 0; i < size; i++)
 	{
+		if (logSize > MAX_FILE_SIZE)
+		{
+			if (logChanged(false))
+			{
+				logClose();
+				logOpen();
+			}
+		}
 		std::pair<std::string, std::string>  item = qq->front();
 		qq->pop();
 

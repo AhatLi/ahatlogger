@@ -19,7 +19,7 @@ public:
 	std::string src_file;
 	int log_type;
 
-	std::string message() {};
+	virtual std::string message() = 0;
 };	
 
 class AhatLogItemInfo : public AhatLogItem

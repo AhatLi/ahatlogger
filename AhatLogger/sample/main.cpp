@@ -5,10 +5,10 @@
 int main()
 {
 	//setting( logfile path, logfile name, loglevel )
-	AhatLogger::setting("", "ahatlogtest", 0); 
+	AhatLogger::setting("logs", "ahatlogtest", 0); 
 	AhatLogger::start();
 
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 1000; i++)
 	{
 		AhatLogger::INFO(CODE, "infolog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
 		AhatLogger::ERR(CODE, "errorlog 1 %d, 2 %f, 3 %c, 4 %s, 5 %.2f", i, 3.14, 'a', "ahatlogger", 1.23456789);
@@ -31,8 +31,6 @@ int main()
 		AhatLogger::IN_REQ_ERR(CODE, reqitem, "in_res_body");
 		AhatLogger::IN_REQ_DEBUG(CODE, reqitem, "in_res_body");
 		AhatLogger::IN_REQ_ERR_DEBUG(CODE, reqitem, "in_res_body");
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	AhatLogger::stop();
 	return 0;
